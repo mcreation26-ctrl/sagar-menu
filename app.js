@@ -375,6 +375,39 @@ let cart = []; // { id, name, price, image, quantity }
 const urlParams = new URLSearchParams(window.location.search);
 const currentTableNumber = urlParams.get('table');
 
+// =============================================
+// WEBHOOK CONFIGURATION (n8n + Telegram)
+// =============================================
+// Replace with your n8n webhook URL
+const WEBHOOK_URL = 'http://localhost:5678/webhook/sagar-order'; // n8n webhook for Telegram notifications
+
+// Function to send order to webhook
+async function sendOrderToWebhook(orderData) {
+    if (!WEBHOOK_URL) {
+        console.log('Webhook URL not configured - skipping notification');
+        return;
+    }
+
+    try {
+        const response = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        if (!response.ok) {
+            console.error('Webhook failed:', response.status);
+        } else {
+            console.log('Order sent to kitchen successfully!');
+        }
+    } catch (error) {
+        console.error('Error sending to webhook:', error);
+        // Don't show error to customer - order is still valid
+    }
+}
+
 // Extract unique categories from menu items
 const categories = ['All', ...new Set(menuItems.map(item => item.category))];
 
@@ -784,6 +817,22 @@ orderModalConfirm.addEventListener('click', () => {
         // User confirmed the order
         isConfirmingOrder = false;
         hideOrderModal();
+
+        // Prepare order data for webhook (n8n -> Telegram)
+        const orderData = {
+            tableNumber: currentTableNumber || 'Walk-in',
+            items: cart.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                total: item.price * item.quantity
+            })),
+            total: calculateTotal(),
+            timestamp: new Date().toISOString()
+        };
+
+        // Send to webhook (async - don't wait)
+        sendOrderToWebhook(orderData);
 
         // Show success message after a brief delay
         setTimeout(() => {
