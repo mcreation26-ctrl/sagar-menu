@@ -1253,3 +1253,181 @@ img {
         transform: translateX(-50%) translateY(0);
     }
 }
+
+/* =============================================
+   ORDER NOTIFICATION MODAL
+   ============================================= */
+.order-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+}
+
+.order-modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.order-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 2001;
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+}
+
+.order-modal.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.order-modal-content {
+    padding: var(--spacing-xl);
+}
+
+.order-modal-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.order-modal-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: var(--spacing-md);
+    animation: bounce 1s ease infinite;
+}
+
+.order-modal-header h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.order-modal-body {
+    max-height: 40vh;
+    overflow-y: auto;
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+}
+
+.order-modal-body .table-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+.order-modal-body .order-items {
+    margin-bottom: var(--spacing-md);
+}
+
+.order-modal-body .order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: var(--font-size-sm);
+    color: var(--text-main);
+}
+
+.order-modal-body .order-item:last-child {
+    border-bottom: none;
+}
+
+.order-modal-body .order-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    border-top: 2px solid var(--primary-color);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.order-modal-body .success-message {
+    text-align: center;
+    color: var(--text-main);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+}
+
+.order-modal-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.btn-modal-cancel {
+    flex: 1;
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    color: var(--text-light);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.btn-modal-cancel:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-modal-confirm {
+    flex: 2;
+    padding: var(--spacing-md);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+    box-shadow: 0 4px 15px rgba(46, 139, 87, 0.3);
+}
+
+.btn-modal-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 139, 87, 0.4);
+}
+
+.btn-modal-confirm.btn-close-only {
+    flex: 1;
+}
+
+.order-modal-actions.single-btn {
+    justify-content: center;
+}
+
+.order-modal-actions.single-btn .btn-modal-confirm {
+    flex: none;
+    min-width: 150px;
+}

@@ -371,6 +371,10 @@ let currentCategory = 'all';
 let searchQuery = '';
 let cart = []; // { id, name, price, image, quantity }
 
+// Get table number from URL parameter (for QR code scanning)
+const urlParams = new URLSearchParams(window.location.search);
+const currentTableNumber = urlParams.get('table');
+
 // Extract unique categories from menu items
 const categories = ['All', ...new Set(menuItems.map(item => item.category))];
 
@@ -683,21 +687,120 @@ clearCartBtn.addEventListener('click', () => {
 
 // Place Order Button
 const placeOrderBtn = document.getElementById('place-order-btn');
+
+// Order Modal Elements
+const orderModal = document.getElementById('order-modal');
+const orderModalOverlay = document.getElementById('order-modal-overlay');
+const orderModalIcon = document.getElementById('order-modal-icon');
+const orderModalTitle = document.getElementById('order-modal-title');
+const orderModalBody = document.getElementById('order-modal-body');
+const orderModalActions = document.getElementById('order-modal-actions');
+const orderModalCancel = document.getElementById('order-modal-cancel');
+const orderModalConfirm = document.getElementById('order-modal-confirm');
+
+// Show Order Modal
+function showOrderModal(type, content) {
+    if (type === 'confirm') {
+        orderModalIcon.textContent = '🛒';
+        orderModalTitle.textContent = 'Order Summary';
+        orderModalBody.innerHTML = content;
+        orderModalCancel.style.display = 'block';
+        orderModalConfirm.textContent = 'Confirm Order';
+        orderModalConfirm.classList.remove('btn-close-only');
+        orderModalActions.classList.remove('single-btn');
+    } else if (type === 'success') {
+        orderModalIcon.textContent = '🎉';
+        orderModalTitle.textContent = 'Order Placed!';
+        orderModalBody.innerHTML = content;
+        orderModalCancel.style.display = 'none';
+        orderModalConfirm.textContent = 'Done';
+        orderModalConfirm.classList.add('btn-close-only');
+        orderModalActions.classList.add('single-btn');
+    } else if (type === 'error') {
+        orderModalIcon.textContent = '⚠️';
+        orderModalTitle.textContent = 'Oops!';
+        orderModalBody.innerHTML = content;
+        orderModalCancel.style.display = 'none';
+        orderModalConfirm.textContent = 'OK';
+        orderModalConfirm.classList.add('btn-close-only');
+        orderModalActions.classList.add('single-btn');
+    }
+
+    orderModal.classList.add('show');
+    orderModalOverlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+// Hide Order Modal
+function hideOrderModal() {
+    orderModal.classList.remove('show');
+    orderModalOverlay.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+// Order Modal Event Listeners
+orderModalOverlay.addEventListener('click', hideOrderModal);
+orderModalCancel.addEventListener('click', hideOrderModal);
+
+// Track modal state
+let isConfirmingOrder = false;
+
 placeOrderBtn.addEventListener('click', () => {
     if (cart.length === 0) {
-        alert('Your cart is empty! Please add some items first.');
+        showOrderModal('error', '<p class="success-message">Your cart is empty!<br>Please add some items first.</p>');
         return;
     }
 
-    const orderSummary = cart.map(item => `${item.name} x ${item.quantity}`).join('\n');
+    // Build order summary HTML
+    const tableInfoHtml = currentTableNumber
+        ? `<div class="table-info">📍 Table ${currentTableNumber}</div>`
+        : '';
+
+    const orderItemsHtml = cart.map(item => `
+        <div class="order-item">
+            <span>${item.name} × ${item.quantity}</span>
+            <span>₹${item.price * item.quantity}</span>
+        </div>
+    `).join('');
+
     const total = calculateTotal();
 
-    const confirmed = confirm(`Order Summary:\n\n${orderSummary}\n\nTotal: ₹${total}\n\nConfirm your order?`);
+    const modalContent = `
+        ${tableInfoHtml}
+        <div class="order-items">${orderItemsHtml}</div>
+        <div class="order-total">
+            <span>Total</span>
+            <span>₹${total}</span>
+        </div>
+    `;
 
-    if (confirmed) {
-        alert('🎉 Order placed successfully!\n\nThank you for your order. Your food will be prepared shortly.');
-        clearCart();
-        closeCart();
+    isConfirmingOrder = true;
+    showOrderModal('confirm', modalContent);
+});
+
+// Handle confirm button click
+orderModalConfirm.addEventListener('click', () => {
+    if (isConfirmingOrder) {
+        // User confirmed the order
+        isConfirmingOrder = false;
+        hideOrderModal();
+
+        // Show success message after a brief delay
+        setTimeout(() => {
+            const tableText = currentTableNumber ? ` for Table ${currentTableNumber}` : '';
+            showOrderModal('success', `
+                <p class="success-message">
+                    Thank you for your order${tableText}!<br><br>
+                    Your food will be prepared shortly.<br>
+                    Please wait at your table.
+                </p>
+            `);
+            clearCart();
+            closeCart();
+        }, 200);
+    } else {
+        // Just closing an info/success modal
+        hideOrderModal();
     }
 });
 
