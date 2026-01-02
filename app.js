@@ -379,7 +379,7 @@ const currentTableNumber = urlParams.get('table');
 // WEBHOOK CONFIGURATION (n8n + Telegram)
 // =============================================
 // Replace with your n8n webhook URL
-const WEBHOOK_URL = 'http://localhost:5678/webhook/sagar-order'; // n8n webhook for Telegram notifications
+const WEBHOOK_URL = 'http://10.255.100.124:55000/webhook/sagar-order'; // n8n webhook (local network)
 
 // Function to send order to webhook
 async function sendOrderToWebhook(orderData) {
